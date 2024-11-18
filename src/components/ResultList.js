@@ -1,17 +1,19 @@
-import React from 'react';
+import React from "react";
 
 const ResultList = ({ results }) => {
   return (
     <div className="result-list">
       <h2>Results:</h2>
       {results.length === 0 ? (
-        <p>No results found.</p>
+        <p>No results to display.</p>
       ) : (
-        results.map((result, index) => (
-          <div key={index} className="result-item">
-            <pre>{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        ))
+        <ul>
+          {results.map((result, index) => (
+            <li key={index} className="result-item">
+              <pre>{JSON.stringify(result, null, 2)}</pre>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

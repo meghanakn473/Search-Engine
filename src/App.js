@@ -15,14 +15,33 @@ function App() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/search", {
-        category,
-        subCategory,
-        inputValue,
-      });
-      setResults(response.data);
+      // Map category to API paths
+      const categoryMap = {
+        Movie: "Movies",
+        "TV Series": "TVSeries",
+        Episodes: "episodes",
+      };
+
+      // Format subcategory to match API keys
+      const formattedSubCategory = subCategory.toLowerCase().replace(" ", "");
+
+      // Construct the API endpoint
+      const apiEndpoint = `http://localhost:7204/api/v1/${categoryMap[category]}?subcategory=${formattedSubCategory}&searchkey=${inputValue}`;
+
+      console.log("Constructed API Endpoint:", apiEndpoint); // Debugging log
+
+      // Fetch data using axios
+      const response = await axios.get(apiEndpoint);
+
+      // Handle empty response
+      if (response.data.length === 0) {
+        setResults([{ error: "No results found." }]);
+      } else {
+        setResults(response.data); // Update results with API response
+      }
     } catch (error) {
       console.error("Error fetching results:", error);
+      setResults([{ error: "Failed to fetch results. Please check your input or try again later." }]);
     }
   };
 
@@ -36,26 +55,35 @@ function App() {
         <h1 className="form-title">Xperi Search Service</h1>
 
         <div className="form">
+          {/* Category Selector */}
           <CategorySelector category={category} setCategory={setCategory} />
+
+          {/* SubCategory Selector */}
           <SubCategorySelector
             category={category}
             subCategory={subCategory}
             setSubCategory={setSubCategory}
           />
+
+          {/* Input Field */}
           <InputField
             category={category}
             subCategory={subCategory}
             inputValue={inputValue}
             setInputValue={setInputValue}
           />
+
+          {/* Submit Button */}
           <button
             onClick={handleSubmit}
             disabled={!category || !subCategory || !inputValue}
+            title={!category || !subCategory || !inputValue ? "Please fill out all fields" : ""}
           >
             Submit
           </button>
         </div>
 
+        {/* Result List */}
         <ResultList results={results} />
       </div>
     </div>
